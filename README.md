@@ -53,7 +53,7 @@ A comprehensive Point of Sale (POS) system built with Vue3, Element-Plus, and Ty
 
 ## Project Structure
 
-\`\`\`
+\`\`
 igourd-pos/
 ├── public/
 │   ├── logo.svg              # iGourd logo
@@ -91,7 +91,7 @@ igourd-pos/
 ├── vite.config.ts            # Vite configuration
 ├── tsconfig.json             # TypeScript configuration
 └── package.json              # Dependencies and scripts
-\`\`\`
+\`\`
 
 ## Installation
 
@@ -117,9 +117,9 @@ igourd-pos/
    \`\`\`
 
 5. **Preview production build:**
-   \`\`\`bash
+   \`\`bash
    npm run preview
-   \`\`\`
+   \`\`
 
 ## Key Concepts
 
@@ -232,14 +232,6 @@ To add new modules (e.g., Customers, Suppliers):
 
 ## Important Notes
 
-### About Linting Errors in v0 Preview
-
-If you see linting errors in the v0 preview environment (like "useHookAtTopLevel"), these are **false positives**. The v0 preview uses a React/Next.js linter that incorrectly interprets Vue's `v-model`, `v-if`, and other directives as React hooks.
-
-**The code is completely valid Vue3 syntax and will work perfectly when you run it locally.**
-
-Once you download and run the project locally with `npm install` and `npm run dev`, the proper Vue3 ESLint configuration will be used and these errors will not appear.
-
 ### Browser Compatibility
 
 IndexedDB is supported in all modern browsers:
@@ -250,12 +242,6 @@ IndexedDB is supported in all modern browsers:
 
 ## Troubleshooting
 
-**Q: I see linting errors in v0 preview**  
-A: These are false positives from the preview environment. Download the project and run it locally - it will work perfectly with the included Vue3 ESLint configuration.
-
-**Q: How do I download the project?**  
-A: Click the three dots in the top right of the code block and select "Download ZIP", or push to GitHub and clone it.
-
 **Q: The app won't start**  
 A: Make sure you've run `npm install` first, then `npm run dev`.
 
@@ -264,9 +250,6 @@ A: Check your browser's IndexedDB storage in DevTools (Application tab in Chrome
 
 **Q: How do I reset the data?**  
 A: Open browser DevTools → Application → IndexedDB → Delete "iGourdPOS" database, then refresh the page. The app will reload with fresh mock data.
-
-**Q: The sidebar toggle button disappears when collapsed**  
-A: This has been fixed! The toggle button now uses absolute positioning and remains visible in both expanded and collapsed states.
 
 ## Future Enhancements
 
@@ -287,4 +270,4 @@ MIT
 
 ---
 
-**Built with ❤️ using Vue3 + Element-Plus**
+**Built with ❤️ by Adam using Vue3 + Element-Plus**
