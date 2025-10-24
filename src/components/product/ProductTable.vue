@@ -1,37 +1,25 @@
 <template>
   <el-table
-    v-loading="loading"
     :data="products"
+    v-loading="loading"
     style="width: 100%"
     row-key="id"
     :expand-row-keys="expandedRows"
     @expand-change="handleExpandChange"
+    @selection-change="handleSelectionChange"
   >
+    <!-- Selection column for row selection -->
+    <el-table-column type="selection" width="55" />
+
     <!-- Expand column for SKU details -->
     <el-table-column type="expand">
       <template #default="{ row }">
         <div class="expand-content">
-          <h4 class="expand-title">
-            SKU Details
-          </h4>
-          <el-table 
-            :data="row.skus" 
-            class="sku-table"
-          >
-            <el-table-column
-              prop="skuCode" 
-              label="SKU Code" 
-              width="180" 
-            />
-            <el-table-column
-              prop="unit"
-              label="Unit"
-              width="100"
-            />
-            <el-table-column
-              label="Specifications"
-              min-width="200"
-            >
+          <h4 class="expand-title">SKU Details</h4>
+          <el-table :data="row.skus" class="sku-table">
+            <el-table-column prop="skuCode" label="SKU Code" width="180" />
+            <el-table-column prop="unit" label="Unit" width="150" />
+            <el-table-column label="Specifications" min-width="200">
               <template #default="{ row: sku }">
                 <el-tag
                   v-for="(value, key) in sku.specs"
@@ -43,36 +31,21 @@
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column
-              label="Price"
-              width="120"
-            >
+            <el-table-column label="Price" width="120">
               <template #default="{ row: sku }">
                 <span class="price">${{ sku.price.toFixed(2) }}</span>
               </template>
             </el-table-column>
-            <el-table-column
-              label="Stock"
-              width="120"
-            >
+            <el-table-column label="Stock" width="120">
               <template #default="{ row: sku }">
-                <el-tag
-                  :type="getStockType(sku.stock)"
-                  size="small"
-                >
+                <el-tag :type="getStockType(sku.stock)" size="small">
                   {{ sku.stock }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column
-              label="Status"
-              width="100"
-            >
+            <el-table-column label="Status" width="100">
               <template #default="{ row: sku }">
-                <el-tag
-                  :type="sku.status === 'active' ? 'success' : 'info'"
-                  size="small"
-                >
+                <el-tag :type="sku.status === 'active' ? 'success' : 'info'" size="small">
                   {{ sku.status }}
                 </el-tag>
               </template>
@@ -82,139 +55,200 @@
       </template>
     </el-table-column>
 
-    <!-- Product Name -->
+    <!-- Product Name with filter -->
     <el-table-column
       prop="name"
       label="Product Name"
       min-width="200"
+      :filters="nameFilters"
+      :filter-method="filterHandler"
+      filter-placement="bottom-end"
     />
 
-    <!-- Category -->
+    <!-- Category with filter -->
     <el-table-column
       prop="category"
       label="Category"
       width="150"
+      :filters="categoryFilters"
+      :filter-method="filterHandler"
+      filter-placement="bottom-end"
     >
       <template #default="{ row }">
-        <el-tag
-          type="primary"
-          size="small"
-        >
-          {{ row.category }}
-        </el-tag>
+        <el-tag type="primary" size="small">{{ row.category }}</el-tag>
       </template>
     </el-table-column>
 
     <!-- SKU Count -->
-    <el-table-column
-      label="SKUs"
-      width="80"
-      align="center"
-    >
+    <el-table-column label="SKUs" width="80" align="center">
       <template #default="{ row }">
-        <el-badge
-          :value="row.skus.length"
-          class="sku-badge"
-        />
+        <el-badge :value="row.skus.length" class="sku-badge" />
       </template>
     </el-table-column>
 
     <!-- Price Range -->
-    <el-table-column
-      label="Price Range"
-      width="150"
-    >
+    <el-table-column label="Price Range" width="150">
       <template #default="{ row }">
         <span class="price-range">{{ getPriceRange(row) }}</span>
       </template>
     </el-table-column>
 
     <!-- Total Stock -->
-    <el-table-column
-      label="Total Stock"
-      width="120"
-      align="center"
-    >
+    <el-table-column label="Total Stock" width="120" align="center">
       <template #default="{ row }">
         <span class="stock-total">{{ getTotalStock(row) }}</span>
       </template>
     </el-table-column>
 
-    <!-- Status -->
+    <!-- Status with filter -->
     <el-table-column
+      prop="status"
       label="Status"
       width="100"
+      :filters="[
+        { text: 'Active', value: 'active' },
+        { text: 'Inactive', value: 'inactive' },
+      ]"
+      :filter-method="filterHandler"
+      filter-placement="bottom-end"
     >
       <template #default="{ row }">
-        <el-tag
-          :type="row.status === 'active' ? 'success' : 'info'"
-          size="small"
-        >
+        <el-tag :type="row.status === 'active' ? 'success' : 'info'" size="small">
           {{ row.status }}
         </el-tag>
       </template>
     </el-table-column>
 
-    <!-- Actions -->
-    <el-table-column
-      label="Actions"
-      width="200"
-      fixed="right"
-    >
+    <!-- Actions with responsive design -->
+    <el-table-column label="Actions" width="200" fixed="right">
       <template #default="{ row }">
-        <el-button
-          type="primary"
-          size="small"
-          @click="$emit('view', row)"
-        >
-          <el-icon><View /></el-icon>
-          <span style="margin-left: 0.25rem">View</span>
-        </el-button>
-        <el-button
-          type="warning"
-          size="small"
-          @click="$emit('edit', row)"
-        >
-          <el-icon><Edit /></el-icon>
-          <span style="margin-left: 0.25rem">Edit</span>
-        </el-button>
-        <el-button
-          type="danger"
-          size="small"
-          @click="$emit('delete', row)"
-        >
-          <el-icon><Delete /></el-icon>
-          <span style="margin-left: 0.25rem">Delete</span>
-        </el-button>
+        <div class="action-buttons">
+          <!-- Show all buttons on larger screens -->
+          <div class="action-buttons-full">
+            <el-button
+              type="primary"
+              size="small"
+              @click="$emit('view', row)"
+            >
+              View
+            </el-button>
+            <el-button
+              type="warning"
+              size="small"
+              @click="$emit('edit', row)"
+            >
+              Edit
+            </el-button>
+            <el-button
+              type="danger"
+              size="small"
+              @click="$emit('delete', row)"
+            >
+              Delete
+            </el-button>
+          </div>
+
+          <!-- Show icon buttons + dropdown on smaller screens -->
+          <div class="action-buttons-compact">
+            <el-button
+              type="primary"
+              size="small"
+              circle
+              @click="$emit('view', row)"
+            >
+              <el-icon><View /></el-icon>
+            </el-button>
+            <el-button
+              type="warning"
+              size="small"
+              circle
+              @click="$emit('edit', row)"
+            >
+              <el-icon><Edit /></el-icon>
+            </el-button>
+            <el-dropdown @command="(cmd) => handleDropdownCommand(cmd, row)">
+              <el-button type="info" size="small" circle>
+                <el-icon><MoreFilled /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="delete">
+                    <el-icon><Delete /></el-icon>
+                    Delete
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+        </div>
       </template>
     </el-table-column>
   </el-table>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-// import { View, Edit, Delete } from '@element-plus/icons-vue'
+import { ref, computed } from 'vue'
+import { View, Edit, Delete, MoreFilled } from '@element-plus/icons-vue'
 import type { Product } from '@/types/product'
 
 // Props
-defineProps<{
+const props = defineProps<{
   products: Product[]
   loading?: boolean
 }>()
 
 // Emits
-defineEmits<{
+const emit = defineEmits<{
   view: [product: Product]
   edit: [product: Product]
   delete: [product: Product]
+  selectionChange: [products: Product[]]
 }>()
 
 // State for expanded rows
 const expandedRows = ref<string[]>([])
 
+// State for selected rows
+const selectedRows = ref<Product[]>([])
+
+// Generate filters for product names
+const nameFilters = computed(() => {
+  const names = new Set(props.products.map((p) => p.name))
+  return Array.from(names).map((name) => ({ text: name, value: name }))
+})
+
+// Generate filters for categories
+const categoryFilters = computed(() => {
+  const categories = new Set(props.products.map((p) => p.category))
+  return Array.from(categories).map((cat) => ({ text: cat, value: cat }))
+})
+
 // Handle row expansion
-const handleExpandChange = (_row: Product, expandedRowsData: Product[]) => {
+const handleExpandChange = (row: Product, expandedRowsData: Product[]) => {
   expandedRows.value = expandedRowsData.map((r) => r.id)
+}
+
+// Handle selection change
+const handleSelectionChange = (selection: Product[]) => {
+  selectedRows.value = selection
+  emit('selectionChange', selection)
+}
+
+// Filter handler for table columns
+const filterHandler = (
+  value: string,
+  row: Product,
+  column: { property: string }
+) => {
+  const property = column.property
+  return row[property as keyof Product] === value
+}
+
+// Handle dropdown command
+const handleDropdownCommand = (command: string, row: Product) => {
+  if (command === 'delete') {
+    emit('delete', row)
+  }
 }
 
 // Calculate price range for a product
@@ -250,7 +284,7 @@ const getStockType = (stock: number): 'success' | 'warning' | 'danger' => {
 
 .expand-title {
   margin-bottom: 1rem;
-  color: #667eea;
+  color: #3b82f6;
   font-size: 1.1rem;
 }
 
@@ -267,12 +301,12 @@ const getStockType = (stock: number): 'success' | 'warning' | 'danger' => {
 
 .price {
   font-weight: 600;
-  color: #667eea;
+  color: #3b82f6;
 }
 
 .price-range {
   font-weight: 500;
-  color: #667eea;
+  color: #3b82f6;
 }
 
 .stock-total {
@@ -281,5 +315,32 @@ const getStockType = (stock: number): 'success' | 'warning' | 'danger' => {
 
 .sku-badge {
   cursor: pointer;
+}
+
+/* Responsive action buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-buttons-full {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-buttons-compact {
+  display: none;
+  gap: 0.5rem;
+}
+
+/* Show compact buttons on smaller screens */
+@media (max-width: 1400px) {
+  .action-buttons-full {
+    display: none;
+  }
+
+  .action-buttons-compact {
+    display: flex;
+  }
 }
 </style>

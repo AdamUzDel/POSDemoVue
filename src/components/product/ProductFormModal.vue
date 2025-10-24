@@ -15,34 +15,17 @@
     >
       <!-- Basic Information Section -->
       <div class="form-section">
-        <h3 class="section-title">
-          Basic Information
-        </h3>
+        <h3 class="section-title">Basic Information</h3>
         
-        <el-form-item
-          label="Product Name"
-          prop="name"
-        >
-          <el-input
-            v-model="formData.name"
-            placeholder="Enter product name"
-          />
+        <el-form-item label="Product Name" prop="name">
+          <el-input v-model="formData.name" placeholder="Enter product name" />
         </el-form-item>
 
-        <el-form-item
-          label="Category"
-          prop="category"
-        >
-          <el-input
-            v-model="formData.category"
-            placeholder="Enter category"
-          />
+        <el-form-item label="Category" prop="category">
+          <el-input v-model="formData.category" placeholder="Enter category" />
         </el-form-item>
 
-        <el-form-item
-          label="Description"
-          prop="description"
-        >
+        <el-form-item label="Description" prop="description">
           <el-input
             v-model="formData.description"
             type="textarea"
@@ -51,27 +34,14 @@
           />
         </el-form-item>
 
-        <el-form-item
-          label="Base Unit"
-          prop="baseUnit"
-        >
-          <el-input
-            v-model="formData.baseUnit"
-            placeholder="e.g., Piece, Gram, Liter"
-          />
+        <el-form-item label="Base Unit" prop="baseUnit">
+          <el-input v-model="formData.baseUnit" placeholder="e.g., Piece, Gram, Liter" />
         </el-form-item>
 
-        <el-form-item
-          label="Status"
-          prop="status"
-        >
+        <el-form-item label="Status" prop="status">
           <el-radio-group v-model="formData.status">
-            <el-radio label="active">
-              Active
-            </el-radio>
-            <el-radio label="inactive">
-              Inactive
-            </el-radio>
+            <el-radio label="active">Active</el-radio>
+            <el-radio label="inactive">Inactive</el-radio>
           </el-radio-group>
         </el-form-item>
       </div>
@@ -80,25 +50,14 @@
       <div class="form-section">
         <h3 class="section-title">
           Units
-          <el-button
-            type="primary"
-            size="small"
-            @click="addUnit"
-          >
+          <el-button type="primary" size="small" @click="addUnit">
             <el-icon><Plus /></el-icon>
             <span style="margin-left: 0.25rem">Add Unit</span>
           </el-button>
         </h3>
 
-        <div
-          v-for="(unit, index) in formData.units"
-          :key="unit.id"
-          class="dynamic-item"
-        >
-          <el-form-item
-            :label="`Unit ${index + 1}`"
-            class="unit-item"
-          >
+        <div v-for="(unit, index) in formData.units" :key="unit.id" class="dynamic-item">
+          <el-form-item :label="`Unit ${index + 1}`" class="unit-item">
             <div class="unit-inputs">
               <el-input
                 v-model="unit.name"
@@ -129,25 +88,14 @@
       <div class="form-section">
         <h3 class="section-title">
           Specifications
-          <el-button
-            type="primary"
-            size="small"
-            @click="addSpecification"
-          >
+          <el-button type="primary" size="small" @click="addSpecification">
             <el-icon><Plus /></el-icon>
             <span style="margin-left: 0.25rem">Add Specification</span>
           </el-button>
         </h3>
 
-        <div
-          v-for="(spec, index) in formData.specifications"
-          :key="spec.id"
-          class="dynamic-item"
-        >
-          <el-form-item
-            :label="`Spec ${index + 1}`"
-            class="spec-item"
-          >
+        <div v-for="(spec, index) in formData.specifications" :key="spec.id" class="dynamic-item">
+          <el-form-item :label="`Spec ${index + 1}`" class="spec-item">
             <div class="spec-inputs">
               <el-input
                 v-model="spec.name"
@@ -162,7 +110,8 @@
                 default-first-option
                 placeholder="Enter values and press Enter"
                 style="flex: 1"
-              />
+              >
+              </el-select>
               <el-button
                 type="danger"
                 size="small"
@@ -177,18 +126,10 @@
       </div>
 
       <!-- SKU Preview Section -->
-      <div
-        v-if="skuPreview.length > 0"
-        class="form-section"
-      >
+      <div v-if="skuPreview.length > 0" class="form-section">
         <h3 class="section-title">
           SKU Preview
-          <el-tag
-            type="info"
-            size="small"
-          >
-            {{ skuPreview.length }} combinations
-          </el-tag>
+          <el-tag type="info" size="small">{{ skuPreview.length }} combinations</el-tag>
         </h3>
         
         <el-alert
@@ -205,18 +146,10 @@
         </el-alert>
 
         <div class="sku-preview-grid">
-          <div
-            v-for="(sku, index) in skuPreview"
-            :key="index"
-            class="sku-preview-item"
-          >
-            <div class="sku-code">
-              {{ sku.skuCode }}
-            </div>
+          <div v-for="(sku, index) in skuPreview" :key="index" class="sku-preview-item">
+            <div class="sku-code">{{ sku.skuCode }}</div>
             <div class="sku-details">
-              <el-tag size="small">
-                {{ sku.unit }}
-              </el-tag>
+              <el-tag size="small">{{ sku.unit }}</el-tag>
               <el-tag
                 v-for="(value, key) in sku.specs"
                 :key="key"
@@ -249,14 +182,8 @@
     </el-form>
 
     <template #footer>
-      <el-button @click="handleClose">
-        Cancel
-      </el-button>
-      <el-button
-        type="primary"
-        :loading="submitting"
-        @click="handleSubmit"
-      >
+      <el-button @click="handleClose">Cancel</el-button>
+      <el-button type="primary" @click="handleSubmit" :loading="submitting">
         {{ mode === 'add' ? 'Add Product' : 'Update Product' }}
       </el-button>
     </template>
@@ -266,13 +193,13 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-// import { Plus, Delete } from '@element-plus/icons-vue'
+import { Plus, Delete } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import type { Product, ProductFormData, /* ProductUnit, ProductSpec, */ ProductSKU } from '@/types/product'
+import type { Product, ProductFormData, ProductUnit, ProductSpec, ProductSKU } from '@/types/product'
 import { generateSKUCombinations } from '@/utils/cartesianProduct'
 
-/* const PlusIcon = Plus
-const DeleteIcon = Delete */
+const PlusIcon = Plus
+const DeleteIcon = Delete
 
 // Props
 const props = defineProps<{
@@ -318,12 +245,11 @@ const rules: FormRules = {
   baseUnit: [{ required: true, message: 'Please enter base unit', trigger: 'blur' }],
 }
 
-// Watch for product changes (edit mode)
 watch(
-  () => props.product,
-  (newProduct) => {
-    if (newProduct && props.mode === 'edit') {
-      // Populate form with existing product data
+  () => [props.product, props.mode, props.modelValue],
+  ([newProduct, newMode, isVisible]) => {
+    if (isVisible && newProduct && newMode === 'edit') {
+      // Deep clone the product data to avoid mutating the original
       formData.value = {
         name: newProduct.name,
         category: newProduct.category,
@@ -334,9 +260,10 @@ watch(
         status: newProduct.status,
       }
       
-      // Populate SKU preview with existing SKUs
+      // Pre-fill SKU preview with existing SKUs
       skuPreview.value = JSON.parse(JSON.stringify(newProduct.skus))
-    } else {
+    } else if (isVisible && newMode === 'add') {
+      // Reset form for add mode
       resetForm()
     }
   },
@@ -465,7 +392,7 @@ const handleClose = () => {
 }
 
 // Reset form to initial state
-function resetForm() {
+const resetForm = () => {
   formData.value = {
     name: '',
     category: '',

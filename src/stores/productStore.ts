@@ -1,102 +1,18 @@
 import { defineStore } from "pinia"
 import { ref, computed } from "vue"
 import type { Product } from "@/types/product"
+import { mockProducts } from "@/data/mockProducts"
+import * as indexedDB from "@/utils/indexedDB"
 
 /**
  * Product Store - Manages product data and operations
- * Uses Pinia for state management
+ * Uses Pinia for state management and IndexedDB for local persistence
  */
 export const useProductStore = defineStore("product", () => {
   // State: List of all products
-  const products = ref<Product[]>([
-    // Sample data for demonstration
-    {
-      id: "1",
-      name: "Premium Wireless Headphones",
-      category: "Electronics",
-      description: "High-quality wireless headphones with noise cancellation",
-      baseUnit: "Piece",
-      units: [
-        { id: "u1", name: "Piece", conversionRate: 1 },
-        { id: "u2", name: "Box", conversionRate: 10 },
-      ],
-      specifications: [
-        { id: "s1", name: "Color", values: ["Black", "White", "Blue"] },
-        { id: "s2", name: "Size", values: ["Standard", "Large"] },
-      ],
-      skus: [
-        {
-          id: "sku1",
-          skuCode: "WH-BLK-STD-PC",
-          unit: "Piece",
-          specs: { Color: "Black", Size: "Standard" },
-          price: 299.99,
-          stock: 150,
-          status: "active",
-        },
-        {
-          id: "sku2",
-          skuCode: "WH-WHT-STD-PC",
-          unit: "Piece",
-          specs: { Color: "White", Size: "Standard" },
-          price: 299.99,
-          stock: 80,
-          status: "active",
-        },
-        {
-          id: "sku3",
-          skuCode: "WH-BLU-LRG-PC",
-          unit: "Piece",
-          specs: { Color: "Blue", Size: "Large" },
-          price: 349.99,
-          stock: 45,
-          status: "active",
-        },
-      ],
-      status: "active",
-      createdAt: "2024-01-15",
-      updatedAt: "2024-01-20",
-    },
-    {
-      id: "2",
-      name: "Organic Green Tea",
-      category: "Food & Beverage",
-      description: "Premium organic green tea leaves",
-      baseUnit: "Gram",
-      units: [
-        { id: "u3", name: "Gram", conversionRate: 1 },
-        { id: "u4", name: "Pack", conversionRate: 100 },
-        { id: "u5", name: "Carton", conversionRate: 1000 },
-      ],
-      specifications: [
-        { id: "s3", name: "Grade", values: ["Premium", "Standard"] },
-        { id: "s4", name: "Package", values: ["Bag", "Box"] },
-      ],
-      skus: [
-        {
-          id: "sku4",
-          skuCode: "GT-PREM-BAG-GRAM",
-          unit: "Gram",
-          specs: { Grade: "Premium", Package: "Bag" },
-          price: 0.5,
-          stock: 5000,
-          status: "active",
-        },
-        {
-          id: "sku5",
-          skuCode: "GT-STD-BOX-PACK",
-          unit: "Pack",
-          specs: { Grade: "Standard", Package: "Box" },
-          price: 35.0,
-          stock: 200,
-          status: "active",
-        },
-      ],
-      status: "active",
-      createdAt: "2024-01-10",
-      updatedAt: "2024-01-18",
-    },
-  ])
+  const products = ref<Product[]>([])
+  const loading = ref(false)
+  const initialized = ref(false)
 
   // Computed: Get all unique categories
   const categories = computed(() => {
@@ -104,38 +20,122 @@ export const useProductStore = defineStore("product", () => {
     return Array.from(cats)
   })
 
-  // Action: Add a new product
-  const addProduct = (product: Product) => {
-    products.value.unshift(product)
-  }
+  /**
+   * Initialize store - Load products from IndexedDB or use mock data
+   */
+  const initialize = async () => {
+    if (initialized.value) return
 
-  // Action: Update an existing product
-  const updateProduct = (id: string, updatedProduct: Product) => {
-    const index = products.value.findIndex((p) => p.id === id)
-    if (index !== -1) {
-      products.value[index] = updatedProduct
+    loading.value = true
+    try {
+      // Try to load products from IndexedDB
+      const storedProducts = await indexedDB.getAllProducts()
+
+      if (storedProducts.length > 0) {
+        // Use stored products if available
+        products.value = storedProducts
+      } else {
+        // Otherwise, load mock data and save to IndexedDB
+        products.value = mockProducts
+        await indexedDB.bulkAddProducts(mockProducts)
+      }
+
+      initialized.value = true
+    } catch (error) {
+      console.error("[v0] Failed to initialize product store:", error)
+      // Fallback to mock data if IndexedDB fails
+      products.value = mockProducts
+    } finally {
+      loading.value = false
     }
   }
 
-  // Action: Delete a product
-  const deleteProduct = (id: string) => {
-    const index = products.value.findIndex((p) => p.id === id)
-    if (index !== -1) {
-      products.value.splice(index, 1)
+  /**
+   * Action: Add a new product
+   */
+  const addProduct = async (product: Product) => {
+    try {
+      // Add to IndexedDB
+      await indexedDB.addProduct(product)
+      // Add to local state
+      products.value.unshift(product)
+    } catch (error) {
+      console.error("[v0] Failed to add product:", error)
+      throw error
     }
   }
 
-  // Action: Get product by ID
+  /**
+   * Action: Update an existing product
+   */
+  const updateProduct = async (id: string, updatedProduct: Product) => {
+    try {
+      // Update in IndexedDB
+      await indexedDB.updateProduct(updatedProduct)
+      // Update in local state
+      const index = products.value.findIndex((p) => p.id === id)
+      if (index !== -1) {
+        products.value[index] = updatedProduct
+      }
+    } catch (error) {
+      console.error("[v0] Failed to update product:", error)
+      throw error
+    }
+  }
+
+  /**
+   * Action: Delete a product
+   */
+  const deleteProduct = async (id: string) => {
+    try {
+      // Delete from IndexedDB
+      await indexedDB.deleteProduct(id)
+      // Delete from local state
+      const index = products.value.findIndex((p) => p.id === id)
+      if (index !== -1) {
+        products.value.splice(index, 1)
+      }
+    } catch (error) {
+      console.error("[v0] Failed to delete product:", error)
+      throw error
+    }
+  }
+
+  /**
+   * Action: Get product by ID
+   */
   const getProductById = (id: string) => {
     return products.value.find((p) => p.id === id)
   }
 
+  /**
+   * Action: Reset to mock data (for development/testing)
+   */
+  const resetToMockData = async () => {
+    try {
+      loading.value = true
+      // Clear IndexedDB
+      await indexedDB.clearAllProducts()
+      // Load mock data
+      await indexedDB.bulkAddProducts(mockProducts)
+      products.value = mockProducts
+    } catch (error) {
+      console.error("[v0] Failed to reset to mock data:", error)
+      throw error
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     products,
+    loading,
     categories,
+    initialize,
     addProduct,
     updateProduct,
     deleteProduct,
     getProductById,
+    resetToMockData,
   }
 })

@@ -1,7 +1,7 @@
 <template>
   <div class="home-page">
     <el-card class="welcome-card">
-      <h1>Welcome to POS System</h1>
+      <h1>Welcome to igourd POS System</h1>
       <p>Select a module from the sidebar to get started</p>
     </el-card>
 

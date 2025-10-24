@@ -3,14 +3,23 @@
     <!-- Sidebar -->
     <aside class="sidebar" :class="{ collapsed: sidebarCollapsed }">
       <div class="sidebar-header">
-        <h1 class="logo">igourd POS</h1>
-        <el-button
-          text
-          :icon="Fold"
-          @click="toggleSidebar"
-          class="collapse-btn"
-        />
+        <!-- Added iGourd logo with conditional rendering based on collapse state -->
+        <div v-if="!sidebarCollapsed" class="logo-container">
+          <img src="/logo.svg" alt="iGourd POS" class="logo-image" />
+        </div>
+        <div v-else class="logo-container-collapsed">
+          <img src="/logo.svg" alt="iGourd" class="logo-icon" />
+        </div>
       </div>
+
+      <!-- Added toggle button that's always visible, positioned absolutely -->
+      <el-button
+        text
+        :icon="sidebarCollapsed ? Expand : Fold"
+        @click="toggleSidebar"
+        class="collapse-btn"
+        :class="{ 'collapsed-state': sidebarCollapsed }"
+      />
 
       <el-menu
         :default-active="activeMenu"
@@ -123,18 +132,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import {
-  Search,
-  HomeFilled,
-  Box,
-  ShoppingCart,
-  DataAnalysis,
-  Setting,
-  Fold,
-  Star,
-  User,
-  ArrowDown
-} from '@element-plus/icons-vue'
+import { Fold, Expand, Search, HomeFilled, Box, ShoppingCart, DataAnalysis, Setting, Star, ArrowDown, User } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -182,10 +180,10 @@ const updateDateTime = () => {
   const hours = String(now.getHours()).padStart(2, '0')
   const minutes = String(now.getMinutes()).padStart(2, '0')
   const seconds = String(now.getSeconds()).padStart(2, '0')
-  currentDateTime.value = `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`
+  currentDateTime.value = `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`
 }
 
-let dateTimeInterval: number
+let dateTimeInterval: number | null = null
 
 onMounted(() => {
   updateDateTime()
@@ -225,6 +223,7 @@ const handleMenuSelect = (index: string) => {
   flex-direction: column;
   transition: width 0.3s ease;
   overflow: hidden;
+  position: relative;
 }
 
 .sidebar.collapsed {
@@ -234,26 +233,66 @@ const handleMenuSelect = (index: string) => {
 .sidebar-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 20px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: 80px;
 }
 
-.logo {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0;
-  white-space: nowrap;
+/* Logo styling for expanded and collapsed states */
+.logo-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+.logo-image {
+  width: 180px;
+  height: auto;
+  object-fit: contain;
+}
+
+.logo-container-collapsed {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+/* Toggle button positioned absolutely to always be visible */
 .collapse-btn {
+  position: absolute;
+  top: 90px;
+  right: 8px;
   color: #fff;
+  z-index: 10;
+  background-color: rgba(59, 130, 246, 0.8);
+  border-radius: 4px;
+  padding: 8px;
+  transition: all 0.3s ease;
+}
+
+.collapse-btn:hover {
+  background-color: rgba(59, 130, 246, 1);
+}
+
+.collapse-btn.collapsed-state {
+  right: 50%;
+  transform: translateX(50%);
 }
 
 .sidebar-menu {
   flex: 1;
   border: none;
   background-color: transparent;
+  margin-top: 20px;
 }
 
 .sidebar-menu :deep(.el-menu-item),
@@ -274,7 +313,7 @@ const handleMenuSelect = (index: string) => {
 }
 
 .sidebar-menu :deep(.el-sub-menu .el-menu-item) {
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.2);
   min-width: 0;
 }
 
