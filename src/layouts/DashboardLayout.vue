@@ -281,9 +281,11 @@ const handleMenuSelect = (index: string) => {
 
 .collapse-btn:hover {
   background-color: rgba(59, 130, 246, 1);
+  color: #111827;
 }
 
 .collapse-btn.collapsed-state {
+  top: 70px;
   right: 50%;
   transform: translateX(50%);
 }
@@ -307,13 +309,14 @@ const handleMenuSelect = (index: string) => {
   color: #fff;
 }
 
-.sidebar-menu :deep(.el-menu-item.is-active) {
+.sidebar-menu :deep(.el-menu-item.is-active),
+.sidebar-menu :deep(.el-sub-menu .el-menu-item.is-active) {
   background-color: #3b82f6;
   color: #fff;
 }
 
 .sidebar-menu :deep(.el-sub-menu .el-menu-item) {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: #374151;
   min-width: 0;
 }
 

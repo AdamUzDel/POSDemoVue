@@ -2,6 +2,7 @@
   <el-table
     :data="products"
     v-loading="loading"
+    stripe
     style="width: 100%"
     row-key="id"
     :expand-row-keys="expandedRows"
