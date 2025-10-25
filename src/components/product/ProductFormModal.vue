@@ -245,19 +245,19 @@ const rules: FormRules = {
   baseUnit: [{ required: true, message: 'Please enter base unit', trigger: 'blur' }],
 }
 
-/* watch(
+watch(
   () => [props.product, props.mode, props.modelValue],
   ([newProduct, newMode, isVisible]) => {
     if (isVisible && newProduct && newMode === 'edit') {
       // Deep clone the product data to avoid mutating the original
       formData.value = {
-        name: "",
-        category: "",
-        description: "",
-        baseUnit: "",
-        units: JSON.parse(JSON.stringify("")),
-        specifications: JSON.parse(JSON.stringify("")),
-        status: ["active" | "inactive"],
+        name: newProduct.name,
+        category: newProduct.category,
+        description: newProduct.description,
+        baseUnit: newProduct.baseUnit,
+        units: JSON.parse(JSON.stringify(newProduct.units)),
+        specifications: JSON.parse(JSON.stringify(newProduct.specifications)),
+        status: newProduct.status,
       }
       
       // Pre-fill SKU preview with existing SKUs
@@ -269,7 +269,6 @@ const rules: FormRules = {
   },
   { immediate: true }
 )
- */
 
 // Watch for changes in units and specifications to regenerate SKU preview
 watch(
