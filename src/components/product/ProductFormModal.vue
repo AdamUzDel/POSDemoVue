@@ -245,7 +245,7 @@ const rules: FormRules = {
   baseUnit: [{ required: true, message: 'Please enter base unit', trigger: 'blur' }],
 }
 
-watch(
+/* watch(
   () => [props.product, props.mode, props.modelValue],
   ([newProduct, newMode, isVisible]) => {
     if (isVisible && newProduct && newMode === 'edit') {
@@ -268,7 +268,7 @@ watch(
     }
   },
   { immediate: true }
-)
+) */
 
 // Watch for changes in units and specifications to regenerate SKU preview
 watch(
