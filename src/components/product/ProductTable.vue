@@ -225,7 +225,7 @@ const categoryFilters = computed(() => {
 })
 
 // Handle row expansion
-const handleExpandChange = (row: Product, expandedRowsData: Product[]) => {
+const handleExpandChange = (/* row: Product, */ expandedRowsData: Product[]) => {
   expandedRows.value = expandedRowsData.map((r) => r.id)
 }
 
