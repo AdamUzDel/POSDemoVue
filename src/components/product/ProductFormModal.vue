@@ -193,13 +193,13 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Plus, Delete } from '@element-plus/icons-vue'
+// import { Plus, Delete } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import type { Product, ProductFormData, ProductUnit, ProductSpec, ProductSKU } from '@/types/product'
+import type { Product, ProductFormData, /* ProductUnit, ProductSpec, */ ProductSKU } from '@/types/product'
 import { generateSKUCombinations } from '@/utils/cartesianProduct'
 
-const PlusIcon = Plus
-const DeleteIcon = Delete
+// const PlusIcon = Plus
+// const DeleteIcon = Delete
 
 // Props
 const props = defineProps<{
@@ -226,7 +226,7 @@ const submitting = ref(false)
 
 // Form data with default values
 const formData = ref<ProductFormData>({
-  name: '',
+  name: '' ,
   category: '',
   description: '',
   baseUnit: '',
@@ -245,19 +245,19 @@ const rules: FormRules = {
   baseUnit: [{ required: true, message: 'Please enter base unit', trigger: 'blur' }],
 }
 
-watch(
+/* watch(
   () => [props.product, props.mode, props.modelValue],
   ([newProduct, newMode, isVisible]) => {
     if (isVisible && newProduct && newMode === 'edit') {
       // Deep clone the product data to avoid mutating the original
       formData.value = {
-        name: newProduct.name,
-        category: newProduct.category,
-        description: newProduct.description,
-        baseUnit: newProduct.baseUnit,
-        units: JSON.parse(JSON.stringify(newProduct.units)),
-        specifications: JSON.parse(JSON.stringify(newProduct.specifications)),
-        status: newProduct.status,
+        name: "",
+        category: "",
+        description: "",
+        baseUnit: "",
+        units: JSON.parse(JSON.stringify("")),
+        specifications: JSON.parse(JSON.stringify("")),
+        status: ["active" | "inactive"],
       }
       
       // Pre-fill SKU preview with existing SKUs
@@ -269,6 +269,7 @@ watch(
   },
   { immediate: true }
 )
+ */
 
 // Watch for changes in units and specifications to regenerate SKU preview
 watch(

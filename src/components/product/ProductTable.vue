@@ -167,7 +167,7 @@
             >
               <el-icon><Edit /></el-icon>
             </el-button>
-            <el-dropdown @command="(cmd) => handleDropdownCommand(cmd, row)">
+            <el-dropdown @command="(cmd: string) => handleDropdownCommand(cmd, row)">
               <el-button type="info" size="small" circle>
                 <el-icon><MoreFilled /></el-icon>
               </el-button>
@@ -189,7 +189,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { View, Edit, Delete, MoreFilled } from '@element-plus/icons-vue'
+// import { View, Edit, Delete, MoreFilled } from '@element-plus/icons-vue'
 import type { Product } from '@/types/product'
 
 // Props
